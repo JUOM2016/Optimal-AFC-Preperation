@@ -1,7 +1,6 @@
 import zhinst.core
 import zhinst.utils
 import numpy as np
-from scipy.signal import chirp
 
 device = 'dev8416'  # device ID for G14.
 daq = zhinst.core.ziDAQServer('localhost', 8004, 6) # Connect to the dataserver
