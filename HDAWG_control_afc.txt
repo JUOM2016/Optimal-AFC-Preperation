@@ -1,0 +1,2 @@
+const sampling_rate = 2.4E9 // Hz; Sampling rate, should be the same as what you set on the right panel!
+
