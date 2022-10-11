@@ -1,0 +1,9 @@
+const LENGTH = 1024;
+wave w_a = placeholder(LENGTH, true, true);
+wave w_b = placeholder(LENGTH, true, true);
+wave w_c = placeholder(LENGTH, true, true);
+wave w_d = placeholder(LENGTH, true, true);
+
+assignWaveIndex(w_a, w_b, w_c, w_d, 10);
+
+playWave(w_a, w_b, w_c, w_d);
