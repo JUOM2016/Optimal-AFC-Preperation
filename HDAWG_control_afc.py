@@ -3,6 +3,8 @@ import zhinst.utils
 import numpy as np
 from measurements.libs.QPLser.AWGmanager import HDAWG_PLser
 import os
+from scipy.signal import square, find_peaks
+from scipy.fft import fft, ifft, fftfreq, fftshift, ifftshift
 
 ##  Initiliase HDAWG system  ##
 device = 'dev8416'  # device ID for G14.
@@ -52,8 +54,53 @@ shuffle_duration=10e-3 # s; shuffling time
 Number_of_AFC_pulses = 50 # Number of repetitions of AFC preperation pulse train
 AFC_amplitude = 0.21 # Maximum amplitde of AFC pulse train
 AFC_duration = 2e-3 # Total time of AFC pulse train
+AFC_samples = round(AFC_duration*sampling_rate)
+AFC_pulse_width = 500e-9 # Width of each pulse in the pulse train (defined from AOM response time)
+AFC_pulse_width_samples = round(AFC_pulse_width*sampling_rate)
 time_between_pulses = 0.3e-3 # Time between reapeted AFC pulse train
-AFC_pulse_train = np.linspace(0,1,AFC_duration*sampling_rate) # AFC pulse train waveform derived from external script
+# AFC_pulse_train = np.linspace(0,1,AFC_duration*sampling_rate) # AFC pulse train waveform derived from external script
+
+OD = 1 # Optical depth of absorption
+tau = 5e-6 # Storage time of AFC
+Delta = 1/tau # AFC tooth seperation
+F_opt = np.pi/(np.arctan((2*np.pi)/OD)) # Optimal finesse calculation
+gamma = Delta/F_opt
+
+samples = int(1e5)
+f = 3E6 # absorption feature width
+freq = np.linspace(-f/2,f/2,samples)
+
+AFC = OD*(1+square(2*np.pi/Delta*freq+1*np.pi*gamma/Delta,gamma/Delta))/2 # AFC definition
+
+AFC_train = ifftshift(ifft(AFC))
+time = ifftshift(fftfreq(n=np.size(freq), d=f/samples))
+
+train_width = 50e-6    # width of pulse train
+
+idx_train = np.where((time >= -train_width/2) & (time < train_width/2))
+
+peaks_abs,_ = find_peaks(np.abs(AFC_train[idx_train]), height = 0.01)
+peaks,_ = find_peaks(np.real(AFC_train[idx_train]), height = 0.01)
+valleys,_ = find_peaks(-np.real(AFC_train[idx_train]), height = 0.01)
+
+Normal_peaks = 1/max(np.abs(AFC_train[idx_train][peaks_abs]))
+
+scaling_fact = int(AFC_samples/len(AFC_train[idx_train]))
+
+def rect(T):
+    #create a centered rectangular pulse of width $T
+    return lambda t: (-T/2 <= t) & (t < T/2)
+
+def pulse_train(t, at, A, shape):
+    #create a train of pulses over $t at times $at and shape $shape
+    return np.sum(A[:,np.newaxis]*shape(t - at[:,np.newaxis]), axis=0)
+
+AFC_pulse_train = pulse_train(
+    t = np.arange(AFC_samples),              # time domain
+    at = scaling_fact*peaks_abs,  # times of pulses
+    A = Normal_peaks*np.abs(AFC_train[idx_train][peaks_abs]),    # height of pulse
+    shape=  rect(AFC_pulse_width_samples)                 # shape of pulse
+)
 
 # Load sequence file
 HDAWG_filename = ('C:\Codes\HDAWG\Sequences\HDAWG_control_afc.txt')
@@ -109,7 +156,7 @@ awgMod.compile(device, awg_program)
 
 wave_AFC_pulse_train = zhinst.utils.convert_awg_waveform(AFC_pulse_train)
 
-daq.set(f'/{device:s}/awgs/0/waveform/waves/10',AFC_pulse_train)
+daq.set(f'/{device:s}/awgs/0/waveform/waves/6',AFC_pulse_train)
 
 # Set HDAWG parameters/settings
 
