@@ -6,6 +6,8 @@ import os
 
 ##  Initiliase HDAWG system  ##
 device = 'dev8416'  # device ID for G14.
+daq = zhinst.core.ziDAQServer('localhost', 8004, 6) # Connect to the dataserver
+daq.connectDevice(device, '1GbE') # Connect to device
 awgMod = HDAWG_PLser(device)
 command_table=1
 
@@ -102,6 +104,12 @@ with open(HDAWG_filename, "r") as file:
     )
 
 awgMod.compile(device, awg_program)
+
+# Convert and send them to the instrument
+
+wave_AFC_pulse_train = zhinst.utils.convert_awg_waveform(AFC_pulse_train)
+
+daq.set(f'/{device:s}/awgs/0/waveform/waves/10',AFC_pulse_train)
 
 # Set HDAWG parameters/settings
 
