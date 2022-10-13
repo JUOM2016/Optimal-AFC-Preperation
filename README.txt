@@ -10,6 +10,8 @@ Optimal Finnese and therefore optimal AFC shape can be calculated using F_opt = 
 
 optimal_afc_shape_paper.ipynb
 
+This Paper makes many AFCs ar differenct central frequencies in parallel
+
 Towards highly multimode optical quantum memory for quantum repeaters.
 Pierre Jobez, Nuala Timoney, Cyril Laplane, Jean Etesse, Alban Ferrier, Philippe Goldner, Nicolas Gisin, and Mikael Afzelius
 Phys. Rev. A 93, 032327 – Published 21 March 2016
