@@ -8,6 +8,8 @@ Finesse = Delta/gamma
 
 Optimal Finnese and therefore optimal AFC shape can be calculated using F_opt = pi/arctan(2pi/OD)
 
+Repository includes code to control Zurich Instruments HDAWG. There is a python script to talk to the HDAAWG and a sequence written in the LabOne languange saved as a .txt.
+
 optimal_afc_shape_paper.ipynb
 
 This Paper makes many AFCs ar differenct central frequencies in parallel
