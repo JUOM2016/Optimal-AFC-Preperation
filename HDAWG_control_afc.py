@@ -2,14 +2,13 @@ import zhinst.core
 import zhinst.utils
 import numpy as np
 from measurements.libs.QPLser.AWGmanager import HDAWG_PLser
-import os
 from scipy.signal import square, find_peaks
-from scipy.fft import fft, ifft, fftfreq, fftshift, ifftshift
+from scipy.fft import ifft, fftfreq, ifftshift
 
 ##  Initiliase HDAWG system  ##
 device = 'dev8416'  # device ID for G14.
 daq = zhinst.core.ziDAQServer('localhost', 8004, 6) # Connect to the dataserver
-daq.connectDevice(device, '1GbE') # Connect to device
+daq.connectDevice(device, 'USB') # Connect to device
 awgMod = HDAWG_PLser(device)
 command_table=1
 
@@ -52,6 +51,7 @@ shuffle_duration=10e-3 # s; shuffling time
 
 # AFC Pulse Train Parameters
 Number_of_AFC_pulses = 50 # Number of repetitions of AFC preperation pulse train
+centre_freq_AFC = 247.6E6 # Centre frequency of AFC preparation pulses
 AFC_amplitude = 0.21 # Maximum amplitde of AFC pulse train
 AFC_duration = 2e-3 # Total time of AFC pulse train
 AFC_samples = round(AFC_duration*sampling_rate)
@@ -108,6 +108,7 @@ HDAWG_filename = ('C:\Codes\HDAWG\Sequences\HDAWG_control_afc.txt')
 with open(HDAWG_filename, "r") as file:
     awg_string = file.read()
     awg_program = awg_string.format(
+        
         # Clock parameters
         sampling_rate = sampling_rate,
 
@@ -156,7 +157,7 @@ awgMod.compile(device, awg_program)
 
 wave_AFC_pulse_train = zhinst.utils.convert_awg_waveform(AFC_pulse_train)
 
-daq.set(f'/{device:s}/awgs/0/waveform/waves/6',AFC_pulse_train)
+daq.set(f'/{device:s}/awgs/0/waveform/waves/10',AFC_pulse_train)
 
 # Set HDAWG parameters/settings
 

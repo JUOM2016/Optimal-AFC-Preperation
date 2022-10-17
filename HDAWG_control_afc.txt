@@ -54,12 +54,10 @@
 
     // AFC Pulse Train Parameters
     const Number_of_AFC_pulses = {Number_of_AFC_pulses}; // Number of AFC pulse train repetitions
-    //const centre_freq_AFC = {centre_freq_AFC}; //Hz; Central frequency of the pusle train (should be centre of the cleaning absorption feature)
-    //const amplitude_AFC = {amplitude_pulse}; //V; Amplitude of each pulse in pulse train (Should be 1 in python code as channel 1 amp is set in command table)
     const AFC_duration = {AFC_duration}; //s; duration of the AFC pulse train
     const samples_AFC = round(AFC_duration*sampling_rate/16)*16;
     const time_between_pulses = {time_between_pulses}; //s; Time between each pulse in pulse train
-    const samples_between_pulses = round((time_between_pulses-pulse_duration)*sampling_rate/16)*16;
+    const samples_between_pulses = round((time_between_pulses-AFC_duration)*sampling_rate/16)*16;
 
     //// Waveform Definitions
 
@@ -84,7 +82,7 @@
     assignWaveIndex(1,chirpedSine_shuffle,5);
 
     wave AFC_pulse_train = placeholder(samples_AFC,false,false);
-    assignWaveIndex(1,AFC_pulse_train,6);
+    assignWaveIndex(1,AFC_pulse_train,10);
 
     //// Pulse Sequence
 
@@ -92,8 +90,8 @@
     const delay_00 = 0.3E-3; //s; time delay between repeated burning pulses 
     const sample_delay_00=round(delay_00*sampling_rate/16)*16;
 
-    reapeat (Number_of_burning_pulses) {{
-        playWave(chirpAmplitude_burning);
+    repeat (Number_of_burning_pulses) {{
+        playWave(chirpedSine_burning);
         playZero(sample_delay_00);
     }}
 
@@ -107,8 +105,8 @@
     const sample_delay_02=round(delay_02*sampling_rate/16)*16;
 
     repeat(Number_of_burning_back_pulses) {{
-        playWave(chirpAmplitude_burning_back);
-        playZero(sample_delay_02)
+        playWave(chirpedSine_burning_back);
+        playZero(sample_delay_02);
     }}
 
     // Wait between burning back and cleaning pulses
@@ -121,7 +119,7 @@
     const sample_delay_04=round(delay_04*sampling_rate/16)*16;
 
     repeat(Number_of_cleaning_pulses){{
-        playWave(chirpAmplitude_cleaning);
+        playWave(chirpedSine_cleaning);
         playZero(sample_delay_04);
     }}
 
@@ -143,7 +141,7 @@
     playZero(sample_delay_05);
 
     // Readout Pulse
-    playWave(chirpAmplitude_reading);
+    playWave(chirpedSine_reading);
 
     // Wait between readout and shuffle pulse
     const delay_06=20E-3;//s; time delay between the read-out pulse and shuffle pulse
@@ -151,7 +149,7 @@
     playZero(sample_delay_06);
 
     // Shuffle Pulse
-    playWave(chirpAmplitude_shuffle);
+    playWave(chirpedSine_shuffle);
 
     // Wait between shuffle pulse and burning pulse
     const delay_07=40E-3;//s; time delay between the shuffle pulse and burning pulse
