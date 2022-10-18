@@ -7,7 +7,6 @@ from scipy.fft import ifft, fftfreq, ifftshift
 ##  Initiliase HDAWG system  ##
 device = 'dev8416'  # device ID for G14.
 awgMod = HDAWG_PLser(device)
-command_table=1
 
 ## Common Parameter Definition
 #Clock Parameters
