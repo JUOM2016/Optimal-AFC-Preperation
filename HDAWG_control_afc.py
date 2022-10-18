@@ -1,5 +1,5 @@
-import zhinst.core
-import zhinst.utils
+import zhinst.utils as zu
+# import zhinst.ziPython as ziPython
 import numpy as np
 from measurements.libs.QPLser.AWGmanager import HDAWG_PLser
 from scipy.signal import square, find_peaks
@@ -7,8 +7,6 @@ from scipy.fft import ifft, fftfreq, ifftshift
 
 ##  Initiliase HDAWG system  ##
 device = 'dev8416'  # device ID for G14.
-daq = zhinst.core.ziDAQServer('localhost', 8004, 6) # Connect to the dataserver
-daq.connectDevice(device, 'USB') # Connect to device
 awgMod = HDAWG_PLser(device)
 command_table=1
 
@@ -18,10 +16,10 @@ sampling_rate=2.4E9 # Hz; Sampling rate, should be the same as what you set on t
 
 # Burning Pulse Parameters
 Number_of_burning_pulses = 300 # Number of burning pulse repetitions
-centre_freq_burning = 250E6 #Hz; Central frequency set to drive the AOM for burning 
-chirpAmplitude_burning = 0.10 # V; amplitude of burning pulse 
+centre_freq_burning = 250E6 #Hz; Central frequency set to drive the AOM for burning
+chirpAmplitude_burning = 0.10 # V; amplitude of burning pulse
 freq_sweeping_burning=3.5E6 # Hz; set the scanning frequency range of burning pulse (the actual scanning range should be 4*freq_detuning)
-burning_duration=0.6e-3 # s; burning time 
+burning_duration=0.6e-3 # s; burning time
 
 # Burning back Pulse Parameters
 Number_of_burning_back_pulses = 200 # Number of burn-back pulse repetitions 
@@ -155,9 +153,9 @@ awgMod.compile(device, awg_program)
 
 # Convert and send them to the instrument
 
-wave_AFC_pulse_train = zhinst.utils.convert_awg_waveform(AFC_pulse_train)
+wave_AFC_pulse_train = zu.convert_awg_waveform(AFC_pulse_train)
 
-daq.set(f'/{device:s}/awgs/0/waveform/waves/10',AFC_pulse_train)
+awgMod.daq.set(f'/{device}/awgs/0/waveform/waves/10',wave_AFC_pulse_train)
 
 # Set HDAWG parameters/settings
 
