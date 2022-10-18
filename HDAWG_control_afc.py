@@ -1,5 +1,4 @@
 import zhinst.utils as zu
-# import zhinst.ziPython as ziPython
 import numpy as np
 from measurements.libs.QPLser.AWGmanager import HDAWG_PLser
 from scipy.signal import square, find_peaks
