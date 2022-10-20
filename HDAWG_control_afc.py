@@ -99,7 +99,7 @@ AFC_pulse_train = pulse_train(
 )
 
 # Load sequence file
-HDAWG_filename = ('C:\Codes\HDAWG\Sequences\HDAWG_control_afc.txt')
+HDAWG_filename = ('C:\HDAWG_control\HDAWG_control_afc.txt')
 
 with open(HDAWG_filename, "r") as file:
     awg_string = file.read()
